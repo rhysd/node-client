@@ -40,26 +40,27 @@ describe('Nvim', function() {
   });
 
   it('can send requests and receive response', function(done) {
-    nvim.eval('{"k1": "v1", "k2": 2}', function(err, res) {
-      equal(err, null);
+    nvim.eval('{"k1": "v1", "k2": 2}').then(function(res) {
       deepEqual(res, {k1: 'v1', k2: 2});
       done();
+    }).catch(function(err){
+        throw err;
     });
   });
 
   it('can receive requests and send responses', function(done) {
-    nvim.eval('rpcrequest(1, "request", 1, 2, 3)', function(err, res) {
-      equal(err, null);
+    nvim.eval('rpcrequest(1, "request", 1, 2, 3)').then(function(res) {
       equal(res, 'received request(1,2,3)');
       deepEqual(requests, [{method: 'request', args: [1, 2, 3]}]);
       deepEqual(notifications, []);
       done();
+    }).catch(function(err){
+      throw err;
     });
   });
 
   it('can receive notifications', function(done) {
-    nvim.eval('rpcnotify(1, "notify", 1, 2, 3)', function(err, res) {
-      equal(err, null);
+    nvim.eval('rpcnotify(1, "notify", 1, 2, 3)').then(function(res) {
       equal(res, 1);
       deepEqual(requests, []);
       setImmediate(function() {
@@ -70,31 +71,34 @@ describe('Nvim', function() {
   });
 
   it('can deal with custom types', function(done) {
-    nvim.command('vsp', function(err, res) {
-      nvim.getWindows(function(err, windows) {
-        equal(windows.length, 2);
-        equal(windows[0] instanceof nvim.Window, true);
-        equal(windows[1] instanceof nvim.Window, true);
-        nvim.setCurrentWindow(windows[1], function(err, res) {
-          nvim.getCurrentWindow(function(err, win) {
-            equal(win.equals(windows[1]), true);
-            nvim.getCurrentBuffer(function(err, buf) {
-              equal(buf instanceof nvim.Buffer, true);
-              buf.getLineSlice(0, -1, true, true, function(err, lines) {
-                deepEqual(lines, ['']);
-                buf.setLineSlice(0, -1, true, true, ['line1', 'line2'], function(err) {
-                  buf.getLineSlice(0, -1, true, true, function(err, lines) {
-                    deepEqual(lines, ['line1', 'line2']);
-                    done();
-                  });
-                });
-              });
-            });
-          });
+    nvim.command('vsp').then(function(res){
+      return nvim.getWindows();
+    }).then(function(windows){
+      equal(windows.length, 2);
+      equal(windows[0] instanceof nvim.Window, true);
+      equal(windows[1] instanceof nvim.Window, true);
+      return nvim.setCurrentWindow(windows[1]).then(function(){
+        return nvim.getCurrentWindow();
+      }).then(function(win){
+        equal(win.equals(windows[1]), true);
+        return nvim.getCurrentBuffer();
+      }).then(function(buf){
+        equal(buf instanceof nvim.Buffer, true);
+        return buf.getLineSlice(0, -1, true, true).then(function(lines){
+          deepEqual(lines, ['']);
+          return buf.setLineSlice(0, -1, true, true, ['line1', 'line2']);
+        }).then(function(){
+          return buf.getLineSlice(0, -1, true, true);
+        }).then(function(lines){
+          deepEqual(lines, ['line1', 'line2']);
+          done();
         });
       });
+    }).catch(function(err){
+      console.log('foo');
+      console.log(err);
+      throw err;
     });
-
   });
 
   it('emits "disconnect" after quit', function(done) {
