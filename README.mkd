@@ -1,8 +1,8 @@
-# neovim-client
+Promisified neovim-client
+=========================
+[![Build Status](https://travis-ci.org/rhysd/promised-neovim-client.svg)](https://travis-ci.org/rhysd/promised-neovim-client)
 
-[![Build Status](https://travis-ci.org/neovim/node-client.png)](https://travis-ci.org/neovim/node-client)
-<br>
-
+This is ES6 `Promise` version NeoVim msgpack-rpc client for modern JavaScript environment.
 
 ## Installation
 
@@ -21,7 +21,7 @@ Examples:
 
 ```js
 var cp = require('child_process');
-var attach = require('neovim-client');
+var attach = require('promised-neovim-client');
 
 var nvim_proc = cp.spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {});
 attach(nvim_proc.stdin, nvim_proc.stdout, function(err, nvim) {
@@ -34,22 +34,22 @@ attach(nvim_proc.stdin, nvim_proc.stdout, function(err, nvim) {
     // handle msgpack-rpc notification
   });
 
-  nvim.command('vsp', function(err, res) {
-    nvim.getWindows(function(err, windows) {
+  nvim
+    .command('vsp')
+    .then(() => nvim.getWindows())
+    .then(windows => {
       console.log(windows.length);  // 2
       console.log(windows[0] instanceof nvim.Window); // true
       console.log(windows[1] instanceof nvim.Window); // true
-      nvim.setCurrentWindow(windows[1], function(err, res) {
-        nvim.getCurrentWindow(function(err, win) {
+      return setCurrentWindow(windows[1])
+        .then(() => nvim.getCurrentWindow())
+        .then(win => {
           console.log(win.equals(windows[1]))  // true
           nvim.quit();
-          nvim.on('disconnect', function() {
-            console.log("Nvim exited!");
-          });
+          nvim.on('disconnect', () => console.log("Nvim exited!"));
         });
-      });
-    });
-  });
+    }).catch(err => console.log(err.message));
+
 });
 ```
 
@@ -57,20 +57,21 @@ Methods are attached to buffers, windows and tabpages according to the
 msgpack-rpc name:
 
 ```js
-nvim.getCurrentBuffer(function(err, buf) {
-  console.log(buf instanceof nvim.Buffer);  // true
-  buf.getLineSlice(0, -1, true, true, function(err, lines) {
-    console.log(lines);  // ['']
-    buf.setLineSlice(0, -1, true, true, ['line1', 'line2'], function(err) {
-      buf.getLineSlice(0, -1, true, true, function(err, lines) {
-        console.log(lines);  // ['line1', 'line2']
-      });
-    });
+nvim
+  .getCurrentBuffer()
+  .then(buf => {
+    console.log(buf instanceof nvim.Buffer);  // true
+    return buf
+      .getLineSlice(0, -1, true, true);
+      .then(lines => {
+        console.log(lines);  // ['']
+        return buf.setLineSlice(0, -1, true, true, ['line1', 'line2']);
+      }).then(() => getLineSlice(0, -1, true, true))
+      .then(lines => console.log(lines))  // ['line1', 'line2']
   });
-});
 ```
 
-A [typescript declaration file](api.d.ts) is available as documentation of the
+A [typescript declaration file](index.d.ts) is available as documentation of the
 API and also for typescript users that seek to use this library. Note that the
 interfaces are [automatically generated](generate-typescript-interfaces.js) at a
 certain point in time, and may not correspond exactly to the API of your
