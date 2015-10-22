@@ -12,7 +12,7 @@ var typeMap = {
   'Integer': 'number',
   'Boolean': 'boolean',
   'Array': 'Array<any>',
-  'Dictionary': '{}',
+  'Dictionary': 'Object',
 };
 
 function convertType(type) {
@@ -34,18 +34,11 @@ function metadataToSignature(method) {
     var type;
     if (i < method.parameterTypes.length) {
       type = convertType(method.parameterTypes[i]);
+      params.push(method.parameters[i] + ': ' + type);
     } else {
-      type = '(err: Error';
-      var rtype = convertType(method.returnType);
-      if (rtype === 'void') {
-        type += ') => void';
-      } else {
-        type += ', res: ' + rtype + ') => void';
-      }
+      return '    ' + method.name + '(' + params.join(', ') + '): Promise<' + convertType(method.returnType) + '>;\n';
     }
-    params.push(method.parameters[i] + ': ' + type);
   }
-  return '    ' + method.name + '(' + params.join(', ') + '): void;\n';
 }
 
 attach(proc.stdin, proc.stdout, function(err, nvim) {
