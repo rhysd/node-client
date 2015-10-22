@@ -5,6 +5,7 @@ var EventEmitter = require('events').EventEmitter;
 var traverse = require('traverse');
 var Session = require('msgpack5rpc');
 var _ = require('lodash');
+var Promise = require('es6-promise').Promise;
 
 function Nvim(session, channel_id) {
   this._session = session;
@@ -46,19 +47,16 @@ function generateWrappers(Nvim, types, metadata) {
       // arguments.
       callArgs = ['this'].concat(args).join(', ');
     }
-    var params = args.concat(['cb']).join(', ');
+    var params = args.join(', ');
     var method = new Function(
       'return function ' + methodName + '(' + params + ') {' +
-      '\n  if (!cb) {' +
-      '\n    this._session.notify("' + func.name + '", [' + callArgs + ']);' +
-      '\n    return;' +
-      '\n  }' +
       '\n  var _this = this;' +
-      '\n  this._session.request("' + func.name +
-          '", [' + callArgs + '], function(err, res) {' +
-      '\n     if (err) return cb(new Error(err[1]));' +
-      '\n     cb(null, _this._decode(res));' +
+      '\n  return new Promise(function(resolve, reject){' +
+      '\n    _this._session.request("' + func.name + '", [' + callArgs + '], function(err, res) {' +
+      '\n     if (err) return reject(new Error(err[1]));' +
+      '\n     resolve(_this._decode(res));' +
       '\n   });' +
+      '\n  });' +
       '\n};'
     )();
     method.metadata = {
@@ -106,6 +104,7 @@ function addExtraNvimMethods(Nvim) {
   };
 }
 
+// Note: Use callback because it may be called more than once.
 module.exports = function attach(writer, reader, cb) {
   var session = new Session([]);
   var initSession = session;
