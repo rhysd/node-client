@@ -56,8 +56,7 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
     process.stdout.write('}\n');
   });
 
-  process.stdout.write('declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<Nvim>;\n');
-  process.stdout.write('export attach;\n\n');
+  process.stdout.write('export declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<Nvim>;\n\n');
 
   proc.stdin.end();
 }).catch(function(err){ console.error(err); });
