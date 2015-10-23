@@ -21,7 +21,7 @@ Examples:
 
 ```js
 var cp = require('child_process');
-var attach = require('promised-neovim-client');
+var attach = require('promised-neovim-client').attach;
 
 var nvim_proc = cp.spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {});
 attach(nvim_proc.stdin, nvim_proc.stdout).then(function(nvim) {
@@ -40,7 +40,7 @@ attach(nvim_proc.stdin, nvim_proc.stdout).then(function(nvim) {
       console.log(windows.length);  // 2
       console.log(windows[0] instanceof nvim.Window); // true
       console.log(windows[1] instanceof nvim.Window); // true
-      return setCurrentWindow(windows[1])
+      return nvim.setCurrentWindow(windows[1])
         .then(() => nvim.getCurrentWindow())
         .then(win => {
           console.log(win.equals(windows[1]))  // true
