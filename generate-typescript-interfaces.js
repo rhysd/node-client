@@ -31,17 +31,12 @@ function convertType(type) {
 function metadataToSignature(method) {
   var params = [];
   for (var i = 0; i < method.parameters.length; i++) {
-    var type;
-    if (i < method.parameterTypes.length) {
-      type = convertType(method.parameterTypes[i]);
-      params.push(method.parameters[i] + ': ' + type);
-    } else {
-      return '    ' + method.name + '(' + params.join(', ') + '): Promise<' + convertType(method.returnType) + '>;\n';
-    }
+    params.push(method.parameters[i] + ': ' + convertType(method.parameterTypes[i]));
   }
+  return '    ' + method.name + '(' + params.join(', ') + '): Promise<' + convertType(method.returnType) + '>;\n';
 }
 
-attach(proc.stdin, proc.stdout, function(err, nvim) {
+attach(proc.stdin, proc.stdout).then(function(nvim) {
   var interfaces = {
     Nvim: nvim.constructor,
     Buffer: nvim.Buffer,
@@ -50,10 +45,7 @@ attach(proc.stdin, proc.stdout, function(err, nvim) {
   };
 
   // use a similar reference path to other definitely typed declarations
-  process.stdout.write('declare module "neovim-client" {\n');
-  process.stdout.write('  export default attach;\n');
-  process.stdout.write('  function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream, cb: (err: Error, nvim: Nvim) => void);\n\n');
-
+  process.stdout.write('declare namespace NvimClient {\n');
   Object.keys(interfaces).forEach(function(key) {
     process.stdout.write('  interface ' + key + ' {\n');
     Object.keys(interfaces[key].prototype).forEach(function(method) {
@@ -66,5 +58,9 @@ attach(proc.stdin, proc.stdout, function(err, nvim) {
   });
 
   process.stdout.write('}\n');
+
+  process.stdout.write('declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<NvimClient.Nvim>;\n');
+  process.stdout.write('export = attach;\n\n');
+
   proc.stdin.end();
-});
+}).catch(function(err){ console.error(err); });
