@@ -13,7 +13,7 @@ npm install --global neovim-client
 ## Usage
 
 This package exports a single `attach()` function which takes a pair of
-write/read streams and invokes a callback with a Nvim API object. This is
+write/read streams and returns a promise with a Nvim API object. This is
 similar to [node-msgpack5rpc](https://github.com/tarruda/node-msgpack5rpc), but
 it provides an automatically generated API.
 
@@ -24,8 +24,7 @@ var cp = require('child_process');
 var attach = require('promised-neovim-client');
 
 var nvim_proc = cp.spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {});
-attach(nvim_proc.stdin, nvim_proc.stdout, function(err, nvim) {
-
+attach(nvim_proc.stdin, nvim_proc.stdout).then(function(nvim) {
   nvim.on('request', function(method, args, resp) {
     // handle msgpack-rpc request
   });
@@ -50,7 +49,7 @@ attach(nvim_proc.stdin, nvim_proc.stdout, function(err, nvim) {
         });
     }).catch(err => console.log(err.message));
 
-});
+}).catch(err => console.log(err.message));
 ```
 
 Methods are attached to buffers, windows and tabpages according to the

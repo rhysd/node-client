@@ -21,7 +21,7 @@ describe('Nvim', function() {
       cwd: __dirname
     });
 
-    attach(nvim.stdin, nvim.stdout, function(err, n) {
+    attach(nvim.stdin, nvim.stdout).then(function(n){
       nvim = n;
       nvim.on('request', function(method, args, resp) {
         requests.push({method: method, args: args});
