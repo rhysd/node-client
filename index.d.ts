@@ -76,6 +76,5 @@ export interface Tabpage {
   getWindow(): Promise<Window>;
   isValid(): Promise<boolean>;
 }
-declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<Nvim>;
-export attach;
+export declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<Nvim>;
 
