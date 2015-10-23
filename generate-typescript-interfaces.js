@@ -1,6 +1,6 @@
 var cp = require('child_process');
 
-var attach = require('./index');
+var attach = require('./index').attach;
 
 
 var proc = cp.spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {
@@ -33,7 +33,7 @@ function metadataToSignature(method) {
   for (var i = 0; i < method.parameters.length; i++) {
     params.push(method.parameters[i] + ': ' + convertType(method.parameterTypes[i]));
   }
-  return '    ' + method.name + '(' + params.join(', ') + '): Promise<' + convertType(method.returnType) + '>;\n';
+  return '  ' + method.name + '(' + params.join(', ') + '): Promise<' + convertType(method.returnType) + '>;\n';
 }
 
 attach(proc.stdin, proc.stdout).then(function(nvim) {
@@ -45,22 +45,19 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
   };
 
   // use a similar reference path to other definitely typed declarations
-  process.stdout.write('declare namespace NvimClient {\n');
   Object.keys(interfaces).forEach(function(key) {
-    process.stdout.write('  interface ' + key + ' {\n');
+    process.stdout.write('export interface ' + key + ' {\n');
     Object.keys(interfaces[key].prototype).forEach(function(method) {
       method = interfaces[key].prototype[method];
       if (method.metadata) {
         process.stdout.write(metadataToSignature(method.metadata));
       }
     })
-    process.stdout.write('  }\n');
+    process.stdout.write('}\n');
   });
 
-  process.stdout.write('}\n');
-
-  process.stdout.write('declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<NvimClient.Nvim>;\n');
-  process.stdout.write('export = attach;\n\n');
+  process.stdout.write('declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<Nvim>;\n');
+  process.stdout.write('export attach;\n\n');
 
   proc.stdin.end();
 }).catch(function(err){ console.error(err); });

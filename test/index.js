@@ -1,7 +1,7 @@
 var assert = require('assert');
 var cp = require('child_process');
 var which = require('which');
-var attach = require('..');
+var attach = require('..').attach;
 
 for (var k in assert) global[k] = assert[k];
 
