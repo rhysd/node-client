@@ -1,7 +1,4 @@
-declare module "neovim-client" {
-  export default attach;
-  function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream, cb: (err: Error, nvim: Nvim) => void);
-
+declare namespace NvimClient {
   interface Nvim {
     command(str: string): Promise<void>;
     feedkeys(keys: string, mode: string, escape_csi: boolean): Promise<void>;
@@ -81,3 +78,6 @@ declare module "neovim-client" {
     isValid(): Promise<boolean>;
   }
 }
+declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<NvimClient.Nvim>;
+export = attach;
+
