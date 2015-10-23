@@ -1,4 +1,4 @@
-export interface Nvim {
+export interface Nvim extends NodeJS.EventEmitter {
   command(str: string): Promise<void>;
   feedkeys(keys: string, mode: string, escape_csi: boolean): Promise<void>;
   input(keys: string): Promise<number>;

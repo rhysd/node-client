@@ -46,7 +46,11 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
 
   // use a similar reference path to other definitely typed declarations
   Object.keys(interfaces).forEach(function(key) {
-    process.stdout.write('export interface ' + key + ' {\n');
+    if (key === 'Nvim') {
+        process.stdout.write('export interface ' + key + ' extends NodeJS.EventEmitter {\n');
+    } else {
+        process.stdout.write('export interface ' + key + ' {\n');
+    }
     Object.keys(interfaces[key].prototype).forEach(function(method) {
       method = interfaces[key].prototype[method];
       if (method.metadata) {
