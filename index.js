@@ -45,7 +45,7 @@ function generateWrappers(Nvim, types, metadata) {
       args = args.slice(1);
       // This is a method of one of the ext types, prepend "this" to the call
       // arguments.
-      callArgs = ['this'].concat(args).join(', ');
+      callArgs = ['_this'].concat(args).join(', ');
     }
     var params = args.join(', ');
     var method = new Function(
