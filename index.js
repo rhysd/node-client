@@ -105,7 +105,7 @@ function addExtraNvimMethods(Nvim) {
 }
 
 // Note: Use callback because it may be called more than once.
-module.exports.attach = function(writer, reader, cb) {
+module.exports.attach = function(writer, reader) {
   var session = new Session([]);
   var initSession = session;
   var nvim = new Nvim(session)

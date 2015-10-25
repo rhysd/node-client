@@ -48,7 +48,7 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
   Object.keys(interfaces).forEach(function(key) {
     if (key === 'Nvim') {
         process.stdout.write('export interface ' + key + ' extends NodeJS.EventEmitter {\n');
-        process.stdout.write('  uiAttach(width: number, height: number, rgb: true, cb?: Function): void;\n');
+        process.stdout.write('  uiAttach(width: number, height: number, rgb: boolean, cb?: Function): void;\n');
         process.stdout.write('  uiDetach(cb?: Function): void;\n');
         process.stdout.write('  uiTryResize(width: number, height: number, cb?: Function): void;\n');
     } else {
