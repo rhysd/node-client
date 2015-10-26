@@ -1,13 +1,14 @@
 Promisified neovim-client
 =========================
-[![Build Status](https://travis-ci.org/rhysd/promised-neovim-client.svg)](https://travis-ci.org/rhysd/promised-neovim-client)
+[![Build Status](https://travis-ci.org/rhysd/promised-neovim-client.svg)](https://travis-ci.org/rhysd/promised-neovim-client) [![npm version](https://badge.fury.io/js/promised-neovim-client.svg)](https://badge.fury.io/js/promised-neovim-client)
 
 This is ES6 `Promise` version NeoVim msgpack-rpc client for modern JavaScript environment.
+I'm dogfooding this package with [NyaoVim](https://github.com/rhysd/NyaoVim) and add many improvements.
 
 ## Installation
 
 ```sh
-npm install --global neovim-client
+npm install --global promised-neovim-client
 ```
 
 ## Usage
