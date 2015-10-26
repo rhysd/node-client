@@ -51,6 +51,7 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
         process.stdout.write('  uiAttach(width: number, height: number, rgb: boolean, cb?: Function): void;\n');
         process.stdout.write('  uiDetach(cb?: Function): void;\n');
         process.stdout.write('  uiTryResize(width: number, height: number, cb?: Function): void;\n');
+        process.stdout.write('  quit(): void;\n');
     } else {
         process.stdout.write('export interface ' + key + ' {\n');
     }
