@@ -71,8 +71,51 @@ nvim
   });
 ```
 
+## TypeScript
+
 A [typescript declaration file](index.d.ts) is available as documentation of the
 API and also for typescript users that seek to use this library. Note that the
 interfaces are [automatically generated](generate-typescript-interfaces.js) at a
 certain point in time, and may not correspond exactly to the API of your
 installed Nvim.
+
+You need not use [DefinitelyTyped](https://github.com/borisyankov/DefinitelyTyped) to use this package with TypeScript.  It is automatically imported if you install this package with `npm`.  TypeScript 1.6 or later is needed.  
+
+```typescript
+/// <reference path="./typings/node/node.d.ts" />
+/// <reference path="./typings/es6-promise/es6-promise.d.ts" />
+import {attach, RPCValue, Window} from 'promised-neovim-client';
+import {spawn} from 'child_process';
+
+const nvim_proc = spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {});
+attach(nvim_proc.stdin, nvim_proc.stdout).then(nvim => {
+  nvim.on('request', (method: string, args: RPCValue[], resp: RPCValue) => {
+    // handle msgpack-rpc request
+  });
+
+  nvim.on('notification', (method: string, args: RPCValue[]) => {
+    // handle msgpack-rpc notification
+  });
+
+  nvim
+    .command('vsp')
+    .then(() => nvim.getWindows())
+    .then((windows: Window[]) => {
+      console.log(windows.length);  // 2
+      console.log(typeof windows[0] === "Window"); // true
+      console.log(typeof windows[1] === "Window"); // true
+      return nvim.setCurrentWindow(windows[1])
+        .then(() => nvim.getCurrentWindow())
+        .then(win => {
+          console.log(win.equals(windows[1]))  // true
+          nvim.quit();
+          nvim.on('disconnect', () => console.log("Nvim exited!"));
+        });
+    }).catch(err => console.log(err.message));
+}).catch(err => console.log(err.message));
+```
+
+## Authors
+
+- __Original Author__: `Thiago de Arruda <tpadilha84@gmail.com>`
+- __Current Author__: `rhysd <lin90162@yahoo.co.jp>`
