@@ -1,7 +1,7 @@
 {
   "name": "promised-neovim-client",
   "description": "Promised Neovim client library for modern JavaScript",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "homepage": "https://github.com/neovim/node-client",
   "authors": [
     {
