@@ -61,10 +61,14 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
         process.stdout.write(metadataToSignature(method.metadata));
       }
     })
+    process.stdout.write('  equals(lhs: ' + key + '): boolean;\n')
     process.stdout.write('}\n');
   });
 
-  process.stdout.write('export declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<Nvim>;\n\n');
+  process.stdout.write('export function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream): Promise<Nvim>;\n\n');
+
+
+  process.stdout.write('export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key:string]: any};\n')
 
   proc.stdin.end();
 }).catch(function(err){ console.error(err); });

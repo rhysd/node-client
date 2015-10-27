@@ -38,6 +38,7 @@ export interface Nvim extends NodeJS.EventEmitter {
   nameToColor(name: string): Promise<number>;
   getColorMap(): Promise<Object>;
   getApiInfo(): Promise<Array<any>>;
+  equals(lhs: Nvim): boolean;
 }
 export interface Buffer {
   lineCount(): Promise<number>;
@@ -56,6 +57,7 @@ export interface Buffer {
   isValid(): Promise<boolean>;
   insert(lnum: number, lines: Array<string>): Promise<void>;
   getMark(name: string): Promise<Array<number>>;
+  equals(lhs: Buffer): boolean;
 }
 export interface Window {
   getBuffer(): Promise<Buffer>;
@@ -72,6 +74,7 @@ export interface Window {
   getPosition(): Promise<Array<number>>;
   getTabpage(): Promise<Tabpage>;
   isValid(): Promise<boolean>;
+  equals(lhs: Window): boolean;
 }
 export interface Tabpage {
   getWindows(): Promise<Array<Window>>;
@@ -79,6 +82,8 @@ export interface Tabpage {
   setVar(name: string, value: Object): Promise<Object>;
   getWindow(): Promise<Window>;
   isValid(): Promise<boolean>;
+  equals(lhs: Tabpage): boolean;
 }
-export declare var attach: (writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream) => Promise<Nvim>;
+export function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream): Promise<Nvim>;
 
+export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key:string]: any};
