@@ -101,6 +101,14 @@ describe('Nvim', function() {
     });
   });
 
+  it('can call APIs while UI attaching', function(done) {
+    nvim.uiAttach(80, 24, false, function(){
+      nvim.getWindows()
+          .then(function(wins){ done(); })
+          .catch(function(err){ throw err; });
+    });
+  });
+
   it('emits "disconnect" after quit', function(done) {
     nvim.on('disconnect', done);
     nvim.quit();
