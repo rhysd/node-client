@@ -9,7 +9,7 @@ export interface Nvim extends NodeJS.EventEmitter {
   replaceTermcodes(str: string, from_part: boolean, do_lt: boolean, special: boolean): Promise<string>;
   commandOutput(str: string): Promise<string>;
   eval(str: string): Promise<Object>;
-  callFunction(fname: string, args: Array<any>): Promise<Object>;
+  callFunction(fname: string, args: Array<RPCValue>): Promise<Object>;
   strwidth(str: string): Promise<number>;
   listRuntimePaths(): Promise<Array<string>>;
   changeDirectory(dir: string): Promise<void>;
@@ -37,7 +37,7 @@ export interface Nvim extends NodeJS.EventEmitter {
   unsubscribe(event: string): Promise<void>;
   nameToColor(name: string): Promise<number>;
   getColorMap(): Promise<Object>;
-  getApiInfo(): Promise<Array<any>>;
+  getApiInfo(): Promise<Array<RPCValue>>;
   equals(lhs: Nvim): boolean;
 }
 export interface Buffer {

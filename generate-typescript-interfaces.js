@@ -11,7 +11,7 @@ var typeMap = {
   'String': 'string',
   'Integer': 'number',
   'Boolean': 'boolean',
-  'Array': 'Array<any>',
+  'Array': 'Array<RPCValue>',
   'Dictionary': 'Object',
 };
 
