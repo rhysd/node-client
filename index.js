@@ -39,7 +39,7 @@ function generateWrappers(Nvim, types, metadata) {
             return param[1];
         });
         var Type, callArgs;
-        if (typeName === 'Vim') {
+        if (typeName === 'Vim' || typeName === 'Ui') {
             Type = Nvim;
             callArgs = args.join(', ');
         } else {
