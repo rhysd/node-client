@@ -18,6 +18,7 @@ export interface Nvim extends NodeJS.EventEmitter {
   delCurrentLine(): Promise<void>;
   getVar(name: string): Promise<Object>;
   setVar(name: string, value: Object): Promise<Object>;
+  delVar(name: string): Promise<Object>;
   getVvar(name: string): Promise<Object>;
   getOption(name: string): Promise<Object>;
   setOption(name: string, value: Object): Promise<void>;
@@ -46,9 +47,12 @@ export interface Buffer {
   setLine(index: number, line: string): Promise<void>;
   delLine(index: number): Promise<void>;
   getLineSlice(start: number, end: number, include_start: boolean, include_end: boolean): Promise<Array<string>>;
+  getLines(start: number, end: number, strict_indexing: boolean): Promise<Array<string>>;
   setLineSlice(start: number, end: number, include_start: boolean, include_end: boolean, replacement: Array<string>): Promise<void>;
+  setLines(start: number, end: number, strict_indexing: boolean, replacement: Array<string>): Promise<void>;
   getVar(name: string): Promise<Object>;
   setVar(name: string, value: Object): Promise<Object>;
+  delVar(name: string): Promise<Object>;
   getOption(name: string): Promise<Object>;
   setOption(name: string, value: Object): Promise<void>;
   getNumber(): Promise<number>;
@@ -57,6 +61,8 @@ export interface Buffer {
   isValid(): Promise<boolean>;
   insert(lnum: number, lines: Array<string>): Promise<void>;
   getMark(name: string): Promise<Array<number>>;
+  addHighlight(src_id: number, hl_group: string, line: number, col_start: number, col_end: number): Promise<number>;
+  clearHighlight(src_id: number, line_start: number, line_end: number): Promise<void>;
   equals(lhs: Buffer): boolean;
 }
 export interface Window {
@@ -69,6 +75,7 @@ export interface Window {
   setWidth(width: number): Promise<void>;
   getVar(name: string): Promise<Object>;
   setVar(name: string, value: Object): Promise<Object>;
+  delVar(name: string): Promise<Object>;
   getOption(name: string): Promise<Object>;
   setOption(name: string, value: Object): Promise<void>;
   getPosition(): Promise<Array<number>>;
@@ -80,6 +87,7 @@ export interface Tabpage {
   getWindows(): Promise<Array<Window>>;
   getVar(name: string): Promise<Object>;
   setVar(name: string, value: Object): Promise<Object>;
+  delVar(name: string): Promise<Object>;
   getWindow(): Promise<Window>;
   isValid(): Promise<boolean>;
   equals(lhs: Tabpage): boolean;
