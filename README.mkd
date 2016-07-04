@@ -75,11 +75,10 @@ nvim
 
 A [typescript declaration file](index.d.ts) is available as documentation of the
 API and also for typescript users that seek to use this library. Note that the
-interfaces are [automatically generated](generate-typescript-interfaces.js) at a
-certain point in time, and may not correspond exactly to the API of your
-installed Nvim.
+interfaces are [automatically generated](scripts/generate-typescript-interfaces.js) at a
+certain point in time, and may not correspond exactly to the API of your installed Nvim.
 
-You need not use [DefinitelyTyped](https://github.com/borisyankov/DefinitelyTyped) to use this package with TypeScript.  It is automatically imported if you install this package with `npm`.  TypeScript 1.6 or later is needed.  
+You need not use [DefinitelyTyped](https://github.com/borisyankov/DefinitelyTyped) to use this package with TypeScript.  It is automatically imported if you install this package with `npm`.  TypeScript 1.6 or later is needed.
 
 ```typescript
 /// <reference path="./typings/node/node.d.ts" />
