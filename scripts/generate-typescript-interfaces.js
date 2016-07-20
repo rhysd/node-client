@@ -1,6 +1,6 @@
 var cp = require('child_process');
 
-var attach = require('./index').attach;
+var attach = require('../index').attach;
 
 
 var proc = cp.spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {
