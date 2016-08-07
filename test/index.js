@@ -9,7 +9,7 @@ try {
   which.sync('nvim');
 } catch (e) {
   console.error('A Neovim installation is required to run the tests',
-                '(see https://github.com/neovim/neovim/wiki/Installing)');
+      '(see https://github.com/neovim/neovim/wiki/Installing)');
   process.exit(1);
 }
 
@@ -39,12 +39,17 @@ describe('Nvim', function() {
     notifications = [];
   });
 
+  after(function(done) {
+    nvim.on('disconnect', done);
+    nvim.quit();
+  });
+
   it('can send requests and receive response', function(done) {
     nvim.eval('{"k1": "v1", "k2": 2}').then(function(res) {
       deepEqual(res, {k1: 'v1', k2: 2});
       done();
     }).catch(function(err){
-        throw err;
+      throw err;
     });
   });
 
@@ -95,22 +100,25 @@ describe('Nvim', function() {
         });
       });
     }).catch(function(err){
-      console.log('foo');
-      console.log(err);
-      throw err;
+      done(err);
     });
   });
 
   it('can call APIs while UI attaching', function(done) {
     nvim.uiAttach(80, 24, false, function(){
       nvim.getWindows()
-          .then(function(wins){ done(); })
-          .catch(function(err){ throw err; });
+        .then(function(wins){ done(); })
+        .catch(function(err){ throw err; });
     });
   });
 
-  it('emits "disconnect" after quit', function(done) {
-    nvim.on('disconnect', done);
-    nvim.quit();
+  it('accepts "notify" to control to send notification or request', function(done) {
+    equal(nvim.command('vsp', true), undefined);
+    nvim.getWindows(false).then(function(res) {
+      ok(res.length > 0);
+      done();
+    }).catch(function(err) {
+      done(err);
+    });
   });
 });

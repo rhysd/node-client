@@ -71,6 +71,16 @@ nvim
   });
 ```
 
+## Notification
+
+A client always send request on calling remote APIs.  This is because client's methods can't know the caller actually uses the returned `Promise` value.  So I added `notify` boolean parameter as the last one of method parameters.  If it is set to `true`, the client sends notification instead of request and it won't return `Promise` value.  Simply will return `undefined` and we cannot know when the API call finishes.
+
+Notification is faster than request because `nvim` needs not to return the response to the client.
+
+```javascript
+nvim.command('echo "This is notification"', true);
+```
+
 ## TypeScript
 
 A [typescript declaration file](index.d.ts) is available as documentation of the

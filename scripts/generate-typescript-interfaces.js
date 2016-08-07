@@ -31,7 +31,11 @@ function convertType(type) {
 function metadataToSignature(method) {
   var params = [];
   for (var i = 0; i < method.parameters.length; i++) {
-    params.push(method.parameters[i] + ': ' + convertType(method.parameterTypes[i]));
+    var name = method.parameters[i];
+    if (name === 'notify') {
+      name += '?';
+    }
+    params.push(name + ': ' + convertType(method.parameterTypes[i]));
   }
   return '  ' + method.name + '(' + params.join(', ') + '): Promise<' + convertType(method.returnType) + '>;\n';
 }

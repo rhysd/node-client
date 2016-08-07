@@ -49,9 +49,14 @@ function generateWrappers(Nvim, types, metadata) {
             // arguments.
             callArgs = ['_this'].concat(args).join(', ');
         }
+        args.push('notify');
         var params = args.join(', ');
         var method = new Function(
                 'return function ' + methodName + '(' + params + ') {' +
+                '\n  if (notify) {' +
+                '\n    this._session.notify("' + func.name + '", [' + callArgs + ']);' +
+                '\n    return;' +
+                '\n  }' +
                 '\n  var _this = this;' +
                 '\n  return new Promise(function(resolve, reject){' +
                 '\n    _this._session.request("' + func.name + '", [' + callArgs + '], function(err, res) {' +
@@ -61,12 +66,14 @@ function generateWrappers(Nvim, types, metadata) {
                 '\n  });' +
                 '\n};'
             )();
+        var paramTypes = func.parameters.map(function(p) { return p[0]; });
+        paramTypes.push('boolean');
         method.metadata = {
             name: methodName,
             deferred: func.deferred,
             returnType: func.return_type,
             parameters: args,
-            parameterTypes: func.parameters.map(function(p) { return p[0]; }),
+            parameterTypes: paramTypes,
             canFail: func.can_fail,
         }
         if (typeName !== 'Vim') {
@@ -160,7 +167,7 @@ module.exports.attach = function(writer, reader) {
                 // Generate a constructor function for each type in metadata.types
                 var Type = new Function(
                         'return function ' + name + '(session, data, decode) { ' +
-                        '\n  this._session = session;' + 
+                        '\n  this._session = session;' +
                         '\n  this._data = data;' +
                         '\n  this._decode = decode;' +
                         '\n};'
