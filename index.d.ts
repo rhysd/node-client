@@ -37,7 +37,7 @@ export interface Nvim extends NodeJS.EventEmitter {
   subscribe(event: string, notify?: boolean): Promise<void>;
   unsubscribe(event: string, notify?: boolean): Promise<void>;
   nameToColor(name: string, notify?: boolean): Promise<number>;
-  getColorMap(notify?: boolean): Promise<Object>;
+  getColorMap(notify?: boolean): Promise<{[key: string]: PRCValue}>;
   getApiInfo(notify?: boolean): Promise<Array<RPCValue>>;
   equals(lhs: Nvim): boolean;
 }
@@ -94,4 +94,4 @@ export interface Tabpage {
 }
 export function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream): Promise<Nvim>;
 
-export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key:string]: any};
+export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key: string]: any};

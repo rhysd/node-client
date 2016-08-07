@@ -12,7 +12,7 @@ var typeMap = {
   'Integer': 'number',
   'Boolean': 'boolean',
   'Array': 'Array<RPCValue>',
-  'Dictionary': 'Object',
+  'Dictionary': '{[key: string]: PRCValue}',
 };
 
 function convertType(type) {
@@ -72,7 +72,7 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
   process.stdout.write('export function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream): Promise<Nvim>;\n\n');
 
 
-  process.stdout.write('export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key:string]: any};\n')
+  process.stdout.write('export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key: string]: any};\n')
 
   proc.stdin.end();
 }).catch(function(err){ console.error(err); });
