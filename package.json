@@ -27,6 +27,9 @@
     }
   ],
   "main": "./index",
+  "engines": {
+    "node": ">=4.4"
+  },
   "dependencies": {
     "lodash": "^3.9.3",
     "msgpack5rpc": "^1.0.2",
