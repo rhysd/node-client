@@ -5,4 +5,5 @@ before_install:
 
 node_js:
   - 'stable'
-  - '0.12'
+  - '5'
+  - '4'
