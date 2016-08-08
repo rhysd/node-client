@@ -1,8 +1,8 @@
 export interface Nvim extends NodeJS.EventEmitter {
-  uiAttach(width: number, height: number, rgb: boolean, cb?: Function): void;
-  uiDetach(cb?: Function): void;
-  uiTryResize(width: number, height: number, cb?: Function): void;
   quit(): void;
+  uiAttach(width: number, height: number, enable_rgb: boolean, notify?: boolean): Promise<void>;
+  uiDetach(notify?: boolean): Promise<void>;
+  uiTryResize(width: number, height: number, notify?: boolean): Promise<Object>;
   command(str: string, notify?: boolean): Promise<void>;
   feedkeys(keys: string, mode: string, escape_csi: boolean, notify?: boolean): Promise<void>;
   input(keys: string, notify?: boolean): Promise<number>;

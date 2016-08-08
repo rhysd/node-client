@@ -43,7 +43,9 @@ function generateWrappers(Nvim, types, metadata) {
         // The type name is the word before the first dash capitalized. If the type
         // is Vim, then it a editor-global method which will be attached to the Nvim
         // class.
-        const methodName = _.camelCase(parts.slice(1).join('_'));
+        const methodName = _.camelCase(
+            (typeName === 'Ui' ? parts : parts.slice(1)).join('_')
+        );
         let args = func.parameters.map(p => p[1]);
         let Type, callArgs;
         if (typeName === 'Vim' || typeName === 'Ui') {
@@ -83,9 +85,9 @@ function generateWrappers(Nvim, types, metadata) {
             returnType: func.return_type,
             parameters: args,
             parameterTypes: paramTypes,
-            canFail: func.can_fail,
+            canFail: func.can_fail
         };
-        if (typeName !== 'Vim') {
+        if (typeName !== 'Vim' && typeName !== 'Ui') {
             method.metadata.parameterTypes.shift();
         }
         Type.prototype[methodName] = method;
@@ -93,30 +95,6 @@ function generateWrappers(Nvim, types, metadata) {
 }
 
 function addExtraNvimMethods(Nvim) {
-    Nvim.prototype.uiAttach = function uiAttach(width, height, rgb, cb) {
-        if (cb) {
-            this._session.request('ui_attach', [width, height, rgb], cb);
-        } else {
-            this._session.notify('ui_attach', [width, height, rgb]);
-        }
-    };
-
-    Nvim.prototype.uiDetach = function uiDetach(cb) {
-        if (cb) {
-            this._session.request('ui_detach', [], cb);
-        } else {
-            this._session.notify('ui_detach', []);
-        }
-    };
-
-    Nvim.prototype.uiTryResize = function uiTryResize(width, height, cb) {
-        if (cb) {
-            this._session.request('ui_try_resize', [width, height], cb);
-        } else {
-            this._session.notify('ui_try_resize', [width, height]);
-        }
-    };
-
     Nvim.prototype.quit = function quit() {
         this.command('qa!', []);
     };
