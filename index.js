@@ -25,6 +25,14 @@ function decode(obj) {
     return obj;
 }
 
+function equals(other) {
+    try {
+        return this._data.toString() === other._data.toString();
+    } catch (e) {
+        return false;
+    }
+}
+
 function generateWrappers(Nvim, types, metadata) {
     for (let i = 0; i < metadata.functions.length; i++) {
         const func = metadata.functions[i];
@@ -163,20 +171,13 @@ module.exports.attach = function(writer, reader) {
 
             Object.keys(metadata.types).forEach(function(name) {
                 // Generate a constructor function for each type in metadata.types
-                const Type = new Function(
-                        'return function ' + name + '(session, data, decode) { ' +
-                        '\n  this._session = session;' +
-                        '\n  this._data = data;' +
-                        '\n  this._decode = decode;' +
-                        '\n};'
-                    )();
-                Type.prototype.equals = function equals(other) {
-                    try {
-                        return this._data.toString() === other._data.toString();
-                    } catch (e) {
-                        return false;
-                    }
+                const Type = function(session, data, decode) {
+                    this._session = session;
+                    this._data = data;
+                    this._decode = decode;
                 };
+                Object.defineProperty(Type, 'name', {value: name});
+                Type.prototype.equals = equals;
 
                 // Collect the type information necessary for msgpack5 deserialization
                 // when it encounters the corresponding ext code.
