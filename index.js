@@ -94,12 +94,6 @@ function generateWrappers(Nvim, types, metadata) {
     }
 }
 
-function addExtraNvimMethods(Nvim) {
-    Nvim.prototype.quit = function quit() {
-        this.command('qa!', []);
-    };
-}
-
 // Note: Use callback because it may be called more than once.
 module.exports.attach = function(writer, reader) {
     let session = new Session([]);
@@ -173,7 +167,8 @@ module.exports.attach = function(writer, reader) {
             });
 
             generateWrappers(Nvim, types, metadata);
-            addExtraNvimMethods(Nvim);
+            Nvim.prototype.quit = function quit() { this.command('qa!'); };
+
             session = new Session(extTypes);
             session.attach(writer, reader);
 

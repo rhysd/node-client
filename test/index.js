@@ -13,13 +13,15 @@ try {
     process.exit(1);
 }
 
+function spawnNvim() {
+    return cp.spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {cwd: __dirname });
+}
+
 describe('Nvim', function() {
     var nvim, requests, notifications;
 
     before(function(done) {
-        nvim = cp.spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {
-            cwd: __dirname
-        });
+        nvim = spawnNvim();
 
         attach(nvim.stdin, nvim.stdout).then(function(n){
             nvim = n;
@@ -106,10 +108,14 @@ describe('Nvim', function() {
 
     it('can call APIs while UI attaching', function(done) {
         nvim.uiAttach(80, 24, false).then(function(){
-            nvim.getWindows()
-                .then(function(wins){ done(); })
-                .catch(function(err){ done(err); });
-        });
+            return nvim.getWindows();
+        }).then(function(){
+            return nvim.uiTryResize(160, 48);
+        }).then(function(){
+            return nvim.uiDetach();
+        })
+        .catch(function(err){ done(err); })
+        .then(function(){ done(); });
     });
 
     it('accepts "notify" to control to send notification or request', function(done) {
