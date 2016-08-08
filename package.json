@@ -28,7 +28,6 @@
   ],
   "main": "./index",
   "dependencies": {
-    "es6-promise": "^3.0.2",
     "lodash": "^3.9.3",
     "msgpack5rpc": "^1.0.2",
     "traverse": "^0.6.6"
