@@ -62,7 +62,7 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
                 process.stdout.write(metadataToSignature(method.metadata));
             }
         })
-        process.stdout.write('  equals(lhs: ' + key + '): boolean;\n');
+        process.stdout.write('  equals(rhs: ' + key + '): boolean;\n');
         process.stdout.write('}\n');
     });
 

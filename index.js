@@ -78,7 +78,7 @@ function generateWrappers(Nvim, types, metadata) {
                 '\n};'
             )();
         const paramTypes = func.parameters.map(p => p[0]);
-        paramTypes.push('boolean');
+        paramTypes.push('Boolean');
         method.metadata = {
             name: methodName,
             deferred: func.deferred,
