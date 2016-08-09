@@ -2,26 +2,26 @@ export interface Nvim extends NodeJS.EventEmitter {
   quit(): void;
   uiAttach(width: number, height: number, enable_rgb: boolean, notify?: boolean): Promise<void>;
   uiDetach(notify?: boolean): Promise<void>;
-  uiTryResize(width: number, height: number, notify?: boolean): Promise<Object>;
+  uiTryResize(width: number, height: number, notify?: boolean): Promise<VimValue>;
   command(str: string, notify?: boolean): Promise<void>;
   feedkeys(keys: string, mode: string, escape_csi: boolean, notify?: boolean): Promise<void>;
   input(keys: string, notify?: boolean): Promise<number>;
   replaceTermcodes(str: string, from_part: boolean, do_lt: boolean, special: boolean, notify?: boolean): Promise<string>;
   commandOutput(str: string, notify?: boolean): Promise<string>;
-  eval(str: string, notify?: boolean): Promise<Object>;
-  callFunction(fname: string, args: Array<RPCValue>, notify?: boolean): Promise<Object>;
+  eval(str: string, notify?: boolean): Promise<VimValue>;
+  callFunction(fname: string, args: Array<RPCValue>, notify?: boolean): Promise<VimValue>;
   strwidth(str: string, notify?: boolean): Promise<number>;
   listRuntimePaths(notify?: boolean): Promise<Array<string>>;
   changeDirectory(dir: string, notify?: boolean): Promise<void>;
   getCurrentLine(notify?: boolean): Promise<string>;
   setCurrentLine(line: string, notify?: boolean): Promise<void>;
   delCurrentLine(notify?: boolean): Promise<void>;
-  getVar(name: string, notify?: boolean): Promise<Object>;
-  setVar(name: string, value: Object, notify?: boolean): Promise<Object>;
-  delVar(name: string, notify?: boolean): Promise<Object>;
-  getVvar(name: string, notify?: boolean): Promise<Object>;
-  getOption(name: string, notify?: boolean): Promise<Object>;
-  setOption(name: string, value: Object, notify?: boolean): Promise<void>;
+  getVar(name: string, notify?: boolean): Promise<VimValue>;
+  setVar(name: string, value: VimValue, notify?: boolean): Promise<VimValue>;
+  delVar(name: string, notify?: boolean): Promise<VimValue>;
+  getVvar(name: string, notify?: boolean): Promise<VimValue>;
+  getOption(name: string, notify?: boolean): Promise<VimValue>;
+  setOption(name: string, value: VimValue, notify?: boolean): Promise<void>;
   outWrite(str: string, notify?: boolean): Promise<void>;
   errWrite(str: string, notify?: boolean): Promise<void>;
   reportError(str: string, notify?: boolean): Promise<void>;
@@ -50,11 +50,11 @@ export interface Buffer {
   getLines(start: number, end: number, strict_indexing: boolean, notify?: boolean): Promise<Array<string>>;
   setLineSlice(start: number, end: number, include_start: boolean, include_end: boolean, replacement: Array<string>, notify?: boolean): Promise<void>;
   setLines(start: number, end: number, strict_indexing: boolean, replacement: Array<string>, notify?: boolean): Promise<void>;
-  getVar(name: string, notify?: boolean): Promise<Object>;
-  setVar(name: string, value: Object, notify?: boolean): Promise<Object>;
-  delVar(name: string, notify?: boolean): Promise<Object>;
-  getOption(name: string, notify?: boolean): Promise<Object>;
-  setOption(name: string, value: Object, notify?: boolean): Promise<void>;
+  getVar(name: string, notify?: boolean): Promise<VimValue>;
+  setVar(name: string, value: VimValue, notify?: boolean): Promise<VimValue>;
+  delVar(name: string, notify?: boolean): Promise<VimValue>;
+  getOption(name: string, notify?: boolean): Promise<VimValue>;
+  setOption(name: string, value: VimValue, notify?: boolean): Promise<void>;
   getNumber(notify?: boolean): Promise<number>;
   getName(notify?: boolean): Promise<string>;
   setName(name: string, notify?: boolean): Promise<void>;
@@ -73,11 +73,11 @@ export interface Window {
   setHeight(height: number, notify?: boolean): Promise<void>;
   getWidth(notify?: boolean): Promise<number>;
   setWidth(width: number, notify?: boolean): Promise<void>;
-  getVar(name: string, notify?: boolean): Promise<Object>;
-  setVar(name: string, value: Object, notify?: boolean): Promise<Object>;
-  delVar(name: string, notify?: boolean): Promise<Object>;
-  getOption(name: string, notify?: boolean): Promise<Object>;
-  setOption(name: string, value: Object, notify?: boolean): Promise<void>;
+  getVar(name: string, notify?: boolean): Promise<VimValue>;
+  setVar(name: string, value: VimValue, notify?: boolean): Promise<VimValue>;
+  delVar(name: string, notify?: boolean): Promise<VimValue>;
+  getOption(name: string, notify?: boolean): Promise<VimValue>;
+  setOption(name: string, value: VimValue, notify?: boolean): Promise<void>;
   getPosition(notify?: boolean): Promise<Array<number>>;
   getTabpage(notify?: boolean): Promise<Tabpage>;
   isValid(notify?: boolean): Promise<boolean>;
@@ -85,9 +85,9 @@ export interface Window {
 }
 export interface Tabpage {
   getWindows(notify?: boolean): Promise<Array<Window>>;
-  getVar(name: string, notify?: boolean): Promise<Object>;
-  setVar(name: string, value: Object, notify?: boolean): Promise<Object>;
-  delVar(name: string, notify?: boolean): Promise<Object>;
+  getVar(name: string, notify?: boolean): Promise<VimValue>;
+  setVar(name: string, value: VimValue, notify?: boolean): Promise<VimValue>;
+  delVar(name: string, notify?: boolean): Promise<VimValue>;
   getWindow(notify?: boolean): Promise<Window>;
   isValid(notify?: boolean): Promise<boolean>;
   equals(rhs: Tabpage): boolean;
@@ -95,3 +95,4 @@ export interface Tabpage {
 export function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream): Promise<Nvim>;
 
 export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key: string]: any};
+export type VimValue = number | boolean | string | any[] | {[key: string]: any} | null

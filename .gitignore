@@ -1,3 +1,4 @@
 node_modules/
-.npmignore
+/.npmignore
 npm-debug.log
+/coverage

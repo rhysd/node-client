@@ -12,6 +12,7 @@ var typeMap = {
     'Boolean': 'boolean',
     'Array': 'Array<RPCValue>',
     'Dictionary': '{[key: string]: RPCValue}',
+    'Object': 'VimValue',
 };
 
 function convertType(type) {
@@ -67,7 +68,11 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
     });
 
     process.stdout.write('export function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream): Promise<Nvim>;\n\n');
-    process.stdout.write('export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key: string]: any};\n')
+    process.stdout.write('export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key: string]: any};\n');
+
+    // Note:
+    // When the result is funcref value, null is returned.
+    process.stdout.write('export type VimValue = number | boolean | string | any[] | {[key: string]: any} | null');
 
     proc.stdin.end();
 }).catch(function(err){ console.error(err); });
