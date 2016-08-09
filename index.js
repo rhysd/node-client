@@ -1,4 +1,5 @@
 /* jshint loopfunc: true, evil: true */
+'use strict';
 
 const util = require('util');
 const EventEmitter = require('events').EventEmitter;

@@ -1,9 +1,11 @@
-var assert = require('assert');
-var cp = require('child_process');
-var which = require('which');
-var attach = require('..').attach;
+const assert = require('assert');
+const cp = require('child_process');
+const which = require('which');
+const attach = require('..').attach;
 
-for (var k in assert) global[k] = assert[k];
+for (let k in assert) {
+    global[k] = assert[k];
+}
 
 try {
     which.sync('nvim');
@@ -17,137 +19,124 @@ function spawnNvim() {
     return cp.spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {cwd: __dirname });
 }
 
-describe('Nvim', function() {
-    var proc, nvim, requests, notifications;
+describe('Nvim', () => {
+    let proc, nvim, requests, notifications;
 
-    before(function(done) {
+    before(done => {
         proc = spawnNvim();
 
-        attach(proc.stdin, proc.stdout).then(function(n){
+        attach(proc.stdin, proc.stdout).then(n => {
             nvim = n;
-            nvim.on('request', function(method, args, resp) {
+            nvim.on('request', (method, args, resp) => {
                 requests.push({method: method, args: args});
                 resp.send('received ' + method + '(' + args + ')');
             });
-            nvim.on('notification', function(method, args) {
+            nvim.on('notification', (method, args) => {
                 notifications.push({method: method, args: args});
             });
             done();
         });
     });
 
-    beforeEach(function() {
+    beforeEach(() => {
         requests = [];
         notifications = [];
     });
 
-    after(function(done) {
+    after(done => {
         nvim.on('disconnect', done);
         nvim.quit();
     });
 
-    it('can send requests and receive response', function(done) {
-        nvim.eval('{"k1": "v1", "k2": 2}').then(function(res) {
+    it('can send requests and receive response', done => {
+        nvim.eval('{"k1": "v1", "k2": 2}').then(res => {
             deepEqual(res, {k1: 'v1', k2: 2});
             done();
-        }).catch(function(err){
-            throw err;
-        });
+        }).catch(err => done(err));
     });
 
-    it('can receive requests and send responses', function(done) {
-        nvim.eval('rpcrequest(1, "request", 1, 2, 3)').then(function(res) {
+    it('can receive requests and send responses', done => {
+        nvim.eval('rpcrequest(1, "request", 1, 2, 3)').then(res => {
             equal(res, 'received request(1,2,3)');
             deepEqual(requests, [{method: 'request', args: [1, 2, 3]}]);
             deepEqual(notifications, []);
             done();
-        }).catch(function(err){
-            throw err;
-        });
+        }).catch(err => done(err));
     });
 
-    it('can receive notifications', function(done) {
-        nvim.eval('rpcnotify(1, "notify", 1, 2, 3)').then(function(res) {
+    it('can receive notifications', done => {
+        nvim.eval('rpcnotify(1, "notify", 1, 2, 3)').then(res => {
             equal(res, 1);
             deepEqual(requests, []);
-            setImmediate(function() {
+            setImmediate(() => {
                 deepEqual(notifications, [{method: 'notify', args: [1, 2, 3]}]);
                 done();
             });
-        });
+        }).catch(err => done(err));
     });
 
-    it('can deal with custom types', function(done) {
-        nvim.command('vsp').then(function(res){
-            return nvim.getWindows();
-        }).then(function(windows){
-            equal(windows.length, 2);
-            equal(windows[0] instanceof nvim.Window, true);
-            equal(windows[1] instanceof nvim.Window, true);
-            return nvim.setCurrentWindow(windows[1]).then(function(){
-                return nvim.getCurrentWindow();
-            }).then(function(win){
-                equal(win.equals(windows[1]), true);
-                return nvim.getCurrentBuffer();
-            }).then(function(buf){
-                equal(buf instanceof nvim.Buffer, true);
-                return buf.getLineSlice(0, -1, true, true).then(function(lines){
-                    deepEqual(lines, ['']);
-                    return buf.setLineSlice(0, -1, true, true, ['line1', 'line2']);
-                }).then(function(){
-                    return buf.getLineSlice(0, -1, true, true);
-                }).then(function(lines){
-                    deepEqual(lines, ['line1', 'line2']);
-                    done();
-                });
-            });
-        }).catch(function(err){
-            done(err);
-        });
+    it('can deal with custom types', done => {
+        nvim.command('vsp')
+            .then(res => nvim.getWindows())
+            .then(windows => {
+                equal(windows.length, 2);
+                equal(windows[0] instanceof nvim.Window, true);
+                equal(windows[1] instanceof nvim.Window, true);
+                return nvim.setCurrentWindow(windows[1])
+                    .then(() => nvim.getCurrentWindow())
+                    .then(win => {
+                        equal(win.equals(windows[1]), true);
+                        return nvim.getCurrentBuffer();
+                    }).then(buf => {
+                        equal(buf instanceof nvim.Buffer, true);
+                        return buf.getLineSlice(0, -1, true, true)
+                            .then(lines => {
+                                deepEqual(lines, ['']);
+                                return buf.setLineSlice(0, -1, true, true, ['line1', 'line2']);
+                            })
+                            .then(() => buf.getLineSlice(0, -1, true, true))
+                            .then(lines => {
+                                deepEqual(lines, ['line1', 'line2']);
+                                done();
+                            });
+                    });
+            }).catch(err => done(err));
     });
 
-    it('can call APIs while UI attaching', function(done) {
-        nvim.uiAttach(80, 24, false).then(function(){
-            return nvim.getWindows();
-        }).then(function(){
-            return nvim.uiTryResize(160, 48);
-        }).then(function(){
-            return nvim.uiDetach();
-        })
-        .catch(function(err){ done(err); })
-        .then(function(){ done(); });
+    it('can call APIs while UI attaching', done => {
+        nvim.uiAttach(80, 24, false)
+            .then( nvim.getWindows())
+            .then(() => nvim.uiTryResize(160, 48))
+            .then(() => nvim.uiDetach())
+            .catch(err => done(err))
+            .then(() => done());
     });
 
-    it('accepts "notify" to control to send notification or request', function(done) {
+    it('accepts "notify" to control to send notification or request', done => {
         equal(nvim.command('vsp', true), undefined);
-        nvim.getWindows(false).then(function(res) {
+        nvim.getWindows(false).then(res => {
             ok(res.length > 0);
             done();
-        }).catch(function(err) {
-            done(err);
-        });
+        }).catch(err => done(err));
     });
 
-    it('emits "disconnect" event when original process is killed', function(done) {
+    it('emits "disconnect" event when original process is killed', done => {
         const p = spawnNvim();
         strictEqual(p.exitCode, null);
 
-        attach(p.stdin, p.stdout).then(function(n) {
-            n.once('disconnect', function() { done(); });
+        attach(p.stdin, p.stdout).then(n => {
+            n.once('disconnect', done);
             p.kill();
         });
     });
 
-    it('quits nvim on calling quit() method', function(done) {
+    it('quits nvim on calling quit() method', done => {
         const p = spawnNvim();
         strictEqual(p.exitCode, null);
         attach(p.stdin, p.stdout)
-            .then(function(n) {
+            .then(n => {
+                p.on('exit', done);
                 n.quit();
-                setTimeout(function() {
-                    notEqual(p.exitCode, null);
-                    done();
-                }, 500);
             });
     });
 });
