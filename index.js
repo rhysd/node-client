@@ -1,5 +1,4 @@
 /* jshint loopfunc: true, evil: true */
-'use strict';
 
 const util = require('util');
 const EventEmitter = require('events').EventEmitter;
@@ -63,20 +62,20 @@ function generateWrappers(Nvim, types, metadata) {
         // XXX:
         // Using string constructor because `notify` argument can't be distinguished
         // if `...args` or `arguments` used.  They need if using anonymous function.
-        const method = new Function(
-                'return function ' + methodName + '(' + params + ') {' +
-                '\n  if (notify) {' +
-                '\n    this._session.notify("' + func.name + '", [' + callArgs + ']);' +
-                '\n    return;' +
-                '\n  }' +
-                '\n  return new Promise((resolve, reject) => {' +
-                '\n    this._session.request("' + func.name + '", [' + callArgs + '], (err, res) => {' +
-                '\n     if (err) return reject(new Error(err[1]));' +
-                '\n     resolve(this._decode(res));' +
-                '\n   });' +
-                '\n  });' +
-                '\n};'
-            )();
+        const method = new Function(`
+                return function ${methodName}(${params}) {
+                  if (notify) {
+                    this._session.notify("${func.name}", [${callArgs}]);
+                    return;
+                  }
+                  return new Promise((resolve, reject) => {
+                    this._session.request("${func.name}", [${callArgs}], (err, res) => {
+                     if (err) return reject(new Error(err[1]));
+                     resolve(this._decode(res));
+                   });
+                  });
+                };
+            `)();
         const paramTypes = func.parameters.map(p => p[0]);
         paramTypes.push('Boolean');
         method.metadata = {
