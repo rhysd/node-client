@@ -11,7 +11,7 @@ var typeMap = {
     'Integer': 'number',
     'Boolean': 'boolean',
     'Array': 'Array<RPCValue>',
-    'Dictionary': '{[key: string]: PRCValue}',
+    'Dictionary': '{[key: string]: RPCValue}',
 };
 
 function convertType(type) {

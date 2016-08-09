@@ -37,9 +37,9 @@ export interface Nvim extends NodeJS.EventEmitter {
   subscribe(event: string, notify?: boolean): Promise<void>;
   unsubscribe(event: string, notify?: boolean): Promise<void>;
   nameToColor(name: string, notify?: boolean): Promise<number>;
-  getColorMap(notify?: boolean): Promise<{[key: string]: PRCValue}>;
+  getColorMap(notify?: boolean): Promise<{[key: string]: RPCValue}>;
   getApiInfo(notify?: boolean): Promise<Array<RPCValue>>;
-  equals(lhs: Nvim): boolean;
+  equals(rhs: Nvim): boolean;
 }
 export interface Buffer {
   lineCount(notify?: boolean): Promise<number>;
@@ -63,7 +63,7 @@ export interface Buffer {
   getMark(name: string, notify?: boolean): Promise<Array<number>>;
   addHighlight(src_id: number, hl_group: string, line: number, col_start: number, col_end: number, notify?: boolean): Promise<number>;
   clearHighlight(src_id: number, line_start: number, line_end: number, notify?: boolean): Promise<void>;
-  equals(lhs: Buffer): boolean;
+  equals(rhs: Buffer): boolean;
 }
 export interface Window {
   getBuffer(notify?: boolean): Promise<Buffer>;
@@ -81,7 +81,7 @@ export interface Window {
   getPosition(notify?: boolean): Promise<Array<number>>;
   getTabpage(notify?: boolean): Promise<Tabpage>;
   isValid(notify?: boolean): Promise<boolean>;
-  equals(lhs: Window): boolean;
+  equals(rhs: Window): boolean;
 }
 export interface Tabpage {
   getWindows(notify?: boolean): Promise<Array<Window>>;
@@ -90,7 +90,7 @@ export interface Tabpage {
   delVar(name: string, notify?: boolean): Promise<Object>;
   getWindow(notify?: boolean): Promise<Window>;
   isValid(notify?: boolean): Promise<boolean>;
-  equals(lhs: Tabpage): boolean;
+  equals(rhs: Tabpage): boolean;
 }
 export function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream): Promise<Nvim>;
 
