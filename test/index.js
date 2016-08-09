@@ -1,3 +1,5 @@
+'use strict';
+
 const assert = require('assert');
 const cp = require('child_process');
 const which = require('which');
