@@ -18,12 +18,12 @@ function spawnNvim() {
 }
 
 describe('Nvim', function() {
-    var nvim, requests, notifications;
+    var proc, nvim, requests, notifications;
 
     before(function(done) {
-        nvim = spawnNvim();
+        proc = spawnNvim();
 
-        attach(nvim.stdin, nvim.stdout).then(function(n){
+        attach(proc.stdin, proc.stdout).then(function(n){
             nvim = n;
             nvim.on('request', function(method, args, resp) {
                 requests.push({method: method, args: args});
@@ -125,6 +125,16 @@ describe('Nvim', function() {
             done();
         }).catch(function(err) {
             done(err);
+        });
+    });
+
+    it('emits "disconnect" event when original process is killed', function(done) {
+        const p = spawnNvim();
+        strictEqual(p.exitCode, null);
+
+        attach(p.stdin, p.stdout).then(function(n) {
+            n.once('disconnect', function() { done(); });
+            p.kill();
         });
     });
 });
