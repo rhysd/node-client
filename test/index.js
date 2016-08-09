@@ -137,4 +137,17 @@ describe('Nvim', function() {
             p.kill();
         });
     });
+
+    it('quits nvim on calling quit() method', function(done) {
+        const p = spawnNvim();
+        strictEqual(p.exitCode, null);
+        attach(p.stdin, p.stdout)
+            .then(function(n) {
+                n.quit();
+                setTimeout(function() {
+                    notEqual(p.exitCode, null);
+                    done();
+                }, 500);
+            });
+    });
 });
