@@ -159,7 +159,7 @@ module.exports.attach = function attach(writer, reader) {
 
         session.request('nvim_get_api_info', [], function(err, res) {
             if (err) {
-                const msg = 'Error at initialization: nvim_get_api_info: ' + err[1];
+                const msg = `Error at initialization: nvim_get_api_info: ${err[1]}: If you're using nvim v0.1.5 or earlier, please update nvim.`;
                 return reject(new Error(msg));
             }
 
