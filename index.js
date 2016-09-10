@@ -7,7 +7,7 @@ const Session = require('msgpack5rpc');
 const _ = require('lodash');
 const traverse = require('traverse');
 
-const RE_VERSION = /^\n*NVIM v?(\d+)\.(\d+)\.(\d+)(.+)\s*\n/;
+const RE_VERSION = /^\n*NVIM v?(\d+)\.(\d+)\.(\d+)(.*)\s*\n/;
 
 function Nvim(session, channel_id) {
     this._session = session;
@@ -63,20 +63,20 @@ function generateWrappers(Nvim, types, metadata) {
         const func = metadata.functions[i];
         const parts = func.name.split('_');
         const typeName = _.capitalize(parts[0]);
-        if (typeName === 'Vim') {
-            // Skip APIs prefixed with 'vim_' because they exist for compatibility reason.
-            continue;
-        }
         // The type name is the word before the first dash capitalized. If the type
         // is Vim, then it a editor-global method which will be attached to the Nvim
         // class.
         const methodName = _.camelCase(
             (typeName === 'Ui' ? parts : parts.slice(1)).join('_')
         );
+        const isLegacyApi = typeName === 'Vim';
         let args = func.parameters.map(p => p[1]);
         let Type, callArgs;
-        if (typeName === 'Nvim' || typeName === 'Ui') {
+        if (typeName === 'Nvim' || typeName === 'Ui' || isLegacyApi) {
             Type = Nvim;
+            if (isLegacyApi && Type.prototype[methodName] !== undefined) {
+                continue;
+            }
             callArgs = args.join(', ');
         } else {
             Type = types[typeName];
@@ -114,7 +114,7 @@ function generateWrappers(Nvim, types, metadata) {
             parameterTypes: paramTypes,
             canFail: func.can_fail
         };
-        if (typeName !== 'Nvim' && typeName !== 'Ui') {
+        if (typeName !== 'Nvim' && typeName !== 'Ui' && isLegacyApi) {
             method.metadata.parameterTypes.shift();
         }
         Type.prototype[methodName] = method;
@@ -157,9 +157,9 @@ module.exports.attach = function attach(writer, reader) {
             nvim.emit('disconnect');
         });
 
-        session.request('nvim_get_api_info', [], function(err, res) {
+        session.request('vim_get_api_info', [], function(err, res) {
             if (err) {
-                const msg = 'Error at initialization: nvim_get_api_info: ' + err[1];
+                const msg = 'Error at initialization: vim_get_api_info: ' + err[1];
                 return reject(new Error(msg));
             }
 

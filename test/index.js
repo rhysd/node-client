@@ -147,8 +147,8 @@ describe('Nvim', () => {
             try {
                 ok(v.major >= 0);
                 ok(v.minor >= 1);
-                ok(v.patch >= 6);
-                ok(v.rest);
+                ok(v.patch >= 5);
+                ok(v.rest !== undefined);
                 done();
             } catch(e) {
                 done(e);
