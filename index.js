@@ -41,12 +41,12 @@ function quit() {
     this.command('qa!', true);
 }
 
-function getVersion(cmd = 'nvim') {
+function getVersion() {
     return this.commandOutput('silent version').then(out => {
         const m = out.match(RE_VERSION);
         if (m === null) {
             throw new Error(
-                `Unexpected output format from '${cmd} --version': ${out}`
+                `Unexpected output format from :version command: '${out}'`
             );
         }
 
