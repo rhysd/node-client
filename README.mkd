@@ -16,7 +16,7 @@ npm install --global promised-neovim-client
 ## Requirements
 
 - Node.js v4.4 or later
-- Neovim v0.1.5 or later
+- Neovim v0.1.6 or later
 
 ## Usage
 
