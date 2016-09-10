@@ -51,7 +51,6 @@
     "tsc": "tsc --target es5 --module commonjs --noImplicitAny --noEmit test/typescript-test.ts",
     "test": "npm run eslint && npm run mocha && npm run tsc",
     "coverage": "istanbul cover _mocha -- test/",
-    "prepublish": "[ -r ~/.global.npmignore ] && cat ~/.global.npmignore > .npmignore || true",
     "eslint": "eslint index.js"
   },
   "keywords": [
