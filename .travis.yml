@@ -8,6 +8,7 @@ install:
   - npm install coveralls
 
 script:
+  - npm run eslint
   - npm run tsc
   - npm run coverage
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js

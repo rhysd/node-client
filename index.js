@@ -1,4 +1,3 @@
-/* jshint loopfunc: true, evil: true */
 'use strict';
 
 const util = require('util');
@@ -22,7 +21,7 @@ function decode(obj) {
         if (item instanceof Session) {
             this.update(item, true);
         } else if (Buffer.isBuffer(item)) {
-            try { this.update(item.toString('utf8')); } catch (e) {}
+            try { this.update(item.toString('utf8')); } catch (e) { /* Ignore */ }
         }
     });
 
@@ -125,7 +124,6 @@ function generateWrappers(Nvim, types, metadata) {
 // Note: Use callback because it may be called more than once.
 module.exports.attach = function attach(writer, reader) {
     let session = new Session([]);
-    let calledCallback = false;
     let nvim = new Nvim(session);
     const initSession = session;
     const pendingRPCs = [];
@@ -142,12 +140,11 @@ module.exports.attach = function attach(writer, reader) {
                 });
             } else {
                 resolve(nvim); // the errback may be called later, but 'specs' must be handled
-                calledCallback = true;
                 nvim.emit('request', decode(method), decode(args), resp);
             }
         });
 
-        session.on('notification', function(method, args) {
+        session.on('notification', function() {
             pendingRPCs.push({
                 type: 'notification',
                 args: Array.prototype.slice.call( arguments )
