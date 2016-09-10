@@ -8,6 +8,8 @@ const Session = require('msgpack5rpc');
 const _ = require('lodash');
 const traverse = require('traverse');
 
+const RE_VERSION = /^\n*NVIM v(\d+)\.(\d+)\.(\d+)(.+)\s*\n/;
+
 function Nvim(session, channel_id) {
     this._session = session;
     this._decode = decode;
@@ -33,6 +35,28 @@ function equals(other) {
     } catch (e) {
         return false;
     }
+}
+
+function quit() {
+    this.command('qa!', true);
+}
+
+function getVersion(cmd = 'nvim') {
+    return this.commandOutput('silent version').then(out => {
+        const m = out.match(RE_VERSION);
+        if (m === null) {
+            throw new Error(
+                `Unexpected output format from '${cmd} --version': ${out}`
+            );
+        }
+
+        return {
+            major: parseInt(m[1], 10),
+            minor: parseInt(m[2], 10),
+            patch: parseInt(m[3], 10),
+            rest: m[4]
+        };
+    });
 }
 
 function generateWrappers(Nvim, types, metadata) {
@@ -99,7 +123,7 @@ function generateWrappers(Nvim, types, metadata) {
 }
 
 // Note: Use callback because it may be called more than once.
-module.exports.attach = function(writer, reader) {
+module.exports.attach = function attach(writer, reader) {
     let session = new Session([]);
     let calledCallback = false;
     let nvim = new Nvim(session);
@@ -138,7 +162,8 @@ module.exports.attach = function(writer, reader) {
 
         session.request('nvim_get_api_info', [], function(err, res) {
             if (err) {
-                return reject(err);
+                const msg = 'Error at initialization: nvim_get_api_info: ' + err[1];
+                return reject(new Error(msg));
             }
 
             const channel_id = res[0];
@@ -171,7 +196,8 @@ module.exports.attach = function(writer, reader) {
             });
 
             generateWrappers(Nvim, types, metadata);
-            Nvim.prototype.quit = function quit() { this.command('qa!'); };
+            Nvim.prototype.quit = quit;
+            Nvim.prototype.getVersion = getVersion;
 
             session = new Session(extTypes);
             session.attach(writer, reader);

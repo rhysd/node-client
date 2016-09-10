@@ -141,4 +141,18 @@ describe('Nvim', () => {
                 n.quit();
             });
     });
+
+    it('shows the version with getVersion() method', done => {
+        nvim.getVersion().then(v => {
+            try {
+                ok(v.major >= 0);
+                ok(v.minor >= 1);
+                ok(v.patch >= 6);
+                ok(v.rest);
+                done();
+            } catch(e) {
+                done(e);
+            }
+        }).catch(done);
+    });
 });
