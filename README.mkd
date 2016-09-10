@@ -13,6 +13,11 @@ I'm dogfooding this package with [NyaoVim](https://github.com/rhysd/NyaoVim) and
 npm install --global promised-neovim-client
 ```
 
+## Requirements
+
+- Node.js v4.4 or later
+- Neovim v0.1.6 or later
+
 ## Usage
 
 This package exports a single `attach()` function which takes a pair of

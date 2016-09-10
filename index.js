@@ -40,6 +40,10 @@ function generateWrappers(Nvim, types, metadata) {
         const func = metadata.functions[i];
         const parts = func.name.split('_');
         const typeName = _.capitalize(parts[0]);
+        if (typeName === 'Vim') {
+            // Skip APIs prefixed with 'vim_' because they exist for compatibility reason.
+            continue;
+        }
         // The type name is the word before the first dash capitalized. If the type
         // is Vim, then it a editor-global method which will be attached to the Nvim
         // class.
@@ -48,7 +52,7 @@ function generateWrappers(Nvim, types, metadata) {
         );
         let args = func.parameters.map(p => p[1]);
         let Type, callArgs;
-        if (typeName === 'Vim' || typeName === 'Ui') {
+        if (typeName === 'Nvim' || typeName === 'Ui') {
             Type = Nvim;
             callArgs = args.join(', ');
         } else {
@@ -87,7 +91,7 @@ function generateWrappers(Nvim, types, metadata) {
             parameterTypes: paramTypes,
             canFail: func.can_fail
         };
-        if (typeName !== 'Vim' && typeName !== 'Ui') {
+        if (typeName !== 'Nvim' && typeName !== 'Ui') {
             method.metadata.parameterTypes.shift();
         }
         Type.prototype[methodName] = method;
@@ -132,7 +136,7 @@ module.exports.attach = function(writer, reader) {
             nvim.emit('disconnect');
         });
 
-        session.request('vim_get_api_info', [], function(err, res) {
+        session.request('nvim_get_api_info', [], function(err, res) {
             if (err) {
                 return reject(err);
             }
