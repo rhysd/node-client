@@ -7,7 +7,7 @@ const Session = require('msgpack5rpc');
 const _ = require('lodash');
 const traverse = require('traverse');
 
-const RE_VERSION = /^\n*NVIM v?(\d+)\.(\d+)\.(\d+)(.+)\s*\n/;
+const RE_VERSION = /^\n*NVIM v?(\d+)\.(\d+)\.(\d+)(.*)\s*\n/;
 
 function Nvim(session, channel_id) {
     this._session = session;
