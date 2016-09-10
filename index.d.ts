@@ -1,5 +1,6 @@
 export interface Nvim extends NodeJS.EventEmitter {
   quit(): void;
+  getVersion(): NvimVersion;
   bufLineCount(buffer: Buffer, notify?: boolean): Promise<number>;
   bufGetLines(buffer: Buffer, start: number, end: number, strict_indexing: boolean, notify?: boolean): Promise<Array<string>>;
   bufSetLines(buffer: Buffer, start: number, end: number, strict_indexing: boolean, replacement: Array<string>, notify?: boolean): Promise<void>;
@@ -131,5 +132,6 @@ export interface Tabpage {
 }
 export function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream): Promise<Nvim>;
 
+export interface NvimVersion { major: number; minor: number; patch: number; rest: string; }
 export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key: string]: any};
 export type VimValue = number | boolean | string | any[] | {[key: string]: any} | null

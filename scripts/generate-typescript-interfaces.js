@@ -54,6 +54,7 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
         if (key === 'Nvim') {
             process.stdout.write('export interface ' + key + ' extends NodeJS.EventEmitter {\n');
             process.stdout.write('  quit(): void;\n');
+            process.stdout.write('  getVersion(): NvimVersion;\n');
         } else {
             process.stdout.write('export interface ' + key + ' {\n');
         }
@@ -68,6 +69,7 @@ attach(proc.stdin, proc.stdout).then(function(nvim) {
     });
 
     process.stdout.write('export function attach(writer: NodeJS.WritableStream, reader: NodeJS.ReadableStream): Promise<Nvim>;\n\n');
+    process.stdout.write('export interface NvimVersion { major: number; minor: number; patch: number; rest: string; }\n');
     process.stdout.write('export type RPCValue = Buffer | Window | Tabpage | number | boolean | string | any[] | {[key: string]: any};\n');
 
     // Note:

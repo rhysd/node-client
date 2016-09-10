@@ -4,6 +4,10 @@ import {spawn} from 'child_process';
 const proc = spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {cwd: __dirname });
 attach(proc.stdin, proc.stdout).then(nvim => {
     nvim.uiAttach(80, 24, false).then(
+        () => nvim.getVersion()
+    ).then(
+        v => console.log(v)
+    ).then(
         () => nvim.command('vsp')
     ).then(
         () => nvim.getWindows()
