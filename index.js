@@ -117,6 +117,9 @@ function generateWrappers(Nvim, types, metadata) {
         if (typeName !== 'Nvim' && typeName !== 'Ui') {
             method.metadata.parameterTypes.shift();
         }
+        if (func.deprecated_since && Type.prototype.hasOwnProperty(methodName)) {
+            continue;
+        }
         Type.prototype[methodName] = method;
     }
 }
