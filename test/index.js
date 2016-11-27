@@ -106,7 +106,7 @@ describe('Nvim', () => {
     });
 
     it('can call APIs while UI attaching', done => {
-        nvim.uiAttach(80, 24, false)
+        nvim.uiAttach(80, 24, {rgb: false})
             .then( nvim.getWindows())
             .then(() => nvim.uiTryResize(160, 48))
             .then(() => nvim.uiDetach())
