@@ -80,7 +80,11 @@ nvim
 
 ## Notification
 
-A client always send request on calling remote APIs.  This is because client's methods can't know the caller actually uses the returned `Promise` value.  So I added `notify` boolean parameter as the last one of method parameters.  If it is set to `true`, the client sends notification instead of request and it won't return `Promise` value.  Simply will return `undefined` and we cannot know when the API call finishes.
+A client always send request on calling remote APIs.
+This is because client's methods can't know the caller actually uses the returned `Promise` value.
+So I added `notify` boolean parameter as the last one of method parameters. If it is set to `true`,
+the client sends notification instead of request and it won't return `Promise` value.  Simply will
+return `undefined` and we cannot know when the API call finishes.
 
 Notification is faster than request because `nvim` needs not to return the response to the client.
 
@@ -95,40 +99,49 @@ API and also for typescript users that seek to use this library. Note that the
 interfaces are [automatically generated](scripts/generate-typescript-interfaces.js) at a
 certain point in time, and may not correspond exactly to the API of your installed Nvim.
 
-You need not use [DefinitelyTyped](https://github.com/borisyankov/DefinitelyTyped) to use this package with TypeScript.  It is automatically imported if you install this package with `npm`.  TypeScript 1.6 or later is needed.
+You need not use [DefinitelyTyped](https://github.com/borisyankov/DefinitelyTyped) to use this
+package with TypeScript. It is automatically imported if you install this package with `npm`.
+TypeScript 1.6 or later is needed. Please install `@types/node` also for `child_process` module.
+
+Below is an example using TypeScript and async/await.
 
 ```typescript
-/// <reference path="./typings/node/node.d.ts" />
-/// <reference path="./typings/es6-promise/es6-promise.d.ts" />
-import {attach, RPCValue, Window} from 'promised-neovim-client';
+import {attach, RPCValue} from 'promised-neovim-client';
 import {spawn} from 'child_process';
 
-const nvim_proc = spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {});
-attach(nvim_proc.stdin, nvim_proc.stdout).then(nvim => {
-  nvim.on('request', (method: string, args: RPCValue[], resp: RPCValue) => {
-    // handle msgpack-rpc request
-  });
+async function run() {
+    const proc = spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {cwd: __dirname });
 
-  nvim.on('notification', (method: string, args: RPCValue[]) => {
-    // handle msgpack-rpc notification
-  });
+    const nvim = await attach(proc.stdin, proc.stdout);
+    nvim.on('request', (method: string, args: RPCValue[], resp: RPCValue) => {
+        // handle msgpack-rpc request
+    });
 
-  nvim
-    .command('vsp')
-    .then(() => nvim.getWindows())
-    .then((windows: Window[]) => {
-      console.log(windows.length);  // 2
-      console.log(typeof windows[0] === "Window"); // true
-      console.log(typeof windows[1] === "Window"); // true
-      return nvim.setCurrentWindow(windows[1])
-        .then(() => nvim.getCurrentWindow())
-        .then(win => {
-          console.log(win.equals(windows[1]))  // true
-          nvim.quit();
-          nvim.on('disconnect', () => console.log("Nvim exited!"));
-        });
-    }).catch(err => console.log(err.message));
-}).catch(err => console.log(err.message));
+    nvim.on('notification', (method: string, args: RPCValue[]) => {
+        // handle msgpack-rpc notification
+    });
+    await nvim.uiAttach(80, 24, {rgb: false});
+
+    const v = await nvim.getVersion();
+    console.log('Version:', v);
+
+    await nvim.command('vsp');
+    const wins = await nvim.listWins();
+    await nvim.setCurrentWin(wins[1]);
+    const win = await nvim.getCurrentWin();
+    console.log('Current window:', win);
+
+    let lines: string[];
+    const buf = await nvim.getCurrentBuf();
+    lines = await buf.getLineSlice(0, -1, true, true);
+    console.log('Before lines:', lines);
+    await buf.setLineSlice(0, -1, true, true, ['line1', 'line2']);
+    lines = await buf.getLineSlice(0, -1, true, true);
+    console.log('After lines:', lines);
+    await nvim.quit();
+}
+
+run().then(() => console.log('Done!'));
 ```
 
 ## Authors

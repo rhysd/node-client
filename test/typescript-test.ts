@@ -1,33 +1,30 @@
 import {attach} from '..';
 import {spawn} from 'child_process';
 
-const proc = spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {cwd: __dirname });
-attach(proc.stdin, proc.stdout).then(nvim => {
-    nvim.uiAttach(80, 24, {rgb: false}).then(
-        () => nvim.getVersion()
-    ).then(
-        v => console.log(v)
-    ).then(
-        () => nvim.command('vsp')
-    ).then(
-        () => nvim.listWins()
-    ).then(
-        windows => nvim.setCurrentWin(windows[1])
-    ).then(
-        () => nvim.getCurrentWin()
-    ).then(win => {
-        console.log(win);
-        return nvim.getCurrentBuf();
-    }).then(
-        buf => buf.getLineSlice(0, -1, true, true).then(lines => {
-            console.log(lines);
-            return buf.setLineSlice(0, -1, true, true, ['line1', 'line2']);
-        }).then(
-            () => buf.getLineSlice(0, -1, true, true)
-        ).then(lines => {
-            console.log(lines);
-            nvim.quit();
-        })
-    );
-});
+async function run() {
+    const proc = spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {cwd: __dirname });
+
+    const nvim = await attach(proc.stdin, proc.stdout);
+    await nvim.uiAttach(80, 24, {rgb: false});
+
+    const v = await nvim.getVersion();
+    console.log('Version:', v);
+
+    await nvim.command('vsp');
+    const wins = await nvim.listWins();
+    await nvim.setCurrentWin(wins[1]);
+    const win = await nvim.getCurrentWin();
+    console.log('Current window:', win);
+
+    let lines: string[];
+    const buf = await nvim.getCurrentBuf();
+    lines = await buf.getLineSlice(0, -1, true, true);
+    console.log('Before lines:', lines);
+    await buf.setLineSlice(0, -1, true, true, ['line1', 'line2']);
+    lines = await buf.getLineSlice(0, -1, true, true);
+    console.log('After lines:', lines);
+    await nvim.quit();
+}
+
+run().then(() => console.log('Done!'));
 
