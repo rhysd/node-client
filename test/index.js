@@ -59,7 +59,7 @@ describe('Nvim', () => {
 
     it('can receive requests and send responses', done => {
         nvim.eval('rpcrequest(1, "request", 1, 2, 3)').then(res => {
-            equal(res, 'received request(1,2,3)');
+            strictEqual(res, 'received request(1,2,3)');
             deepEqual(requests, [{method: 'request', args: [1, 2, 3]}]);
             deepEqual(notifications, []);
             done();
@@ -68,7 +68,7 @@ describe('Nvim', () => {
 
     it('can receive notifications', done => {
         nvim.eval('rpcnotify(1, "notify", 1, 2, 3)').then(res => {
-            equal(res, 1);
+            strictEqual(res, 1);
             deepEqual(requests, []);
             setImmediate(() => {
                 deepEqual(notifications, [{method: 'notify', args: [1, 2, 3]}]);
@@ -79,18 +79,18 @@ describe('Nvim', () => {
 
     it('can deal with custom types', done => {
         nvim.command('vsp')
-            .then(res => nvim.getWindows())
+            .then(res => nvim.listWins())
             .then(windows => {
-                equal(windows.length, 2);
-                equal(windows[0] instanceof nvim.Window, true);
-                equal(windows[1] instanceof nvim.Window, true);
-                return nvim.setCurrentWindow(windows[1])
-                    .then(() => nvim.getCurrentWindow())
+                strictEqual(windows.length, 2);
+                ok(windows[0] instanceof nvim.Window);
+                ok(windows[1] instanceof nvim.Window);
+                return nvim.setCurrentWin(windows[1])
+                    .then(() => nvim.getCurrentWin())
                     .then(win => {
-                        equal(win.equals(windows[1]), true);
-                        return nvim.getCurrentBuffer();
+                        ok(win.equals(windows[1]));
+                        return nvim.getCurrentBuf();
                     }).then(buf => {
-                        equal(buf instanceof nvim.Buffer, true);
+                        ok(buf instanceof nvim.Buffer);
                         return buf.getLineSlice(0, -1, true, true)
                             .then(lines => {
                                 deepEqual(lines, ['']);
@@ -107,7 +107,7 @@ describe('Nvim', () => {
 
     it('can call APIs while UI attaching', done => {
         nvim.uiAttach(80, 24, {rgb: false})
-            .then( nvim.getWindows())
+            .then( nvim.listWins())
             .then(() => nvim.uiTryResize(160, 48))
             .then(() => nvim.uiDetach())
             .catch(err => done(err))
@@ -115,8 +115,8 @@ describe('Nvim', () => {
     });
 
     it('accepts "notify" to control to send notification or request', done => {
-        equal(nvim.command('vsp', true), undefined);
-        nvim.getWindows(false).then(res => {
+        strictEqual(nvim.command('vsp', true), undefined);
+        nvim.listWins(false).then(res => {
             ok(res.length > 0);
             done();
         }).catch(err => done(err));
@@ -146,9 +146,8 @@ describe('Nvim', () => {
         nvim.getVersion().then(v => {
             try {
                 ok(v.major >= 0);
-                ok(v.minor >= 1);
-                ok(v.patch >= 6);
-                ok(v.rest !== undefined);
+                ok(v.minor >= 2);
+                ok(v.patch >= 0);
                 done();
             } catch(e) {
                 done(e);

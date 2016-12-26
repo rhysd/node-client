@@ -3,21 +3,21 @@ import {spawn} from 'child_process';
 
 const proc = spawn('nvim', ['-u', 'NONE', '-N', '--embed'], {cwd: __dirname });
 attach(proc.stdin, proc.stdout).then(nvim => {
-    nvim.uiAttach(80, 24, false).then(
+    nvim.uiAttach(80, 24, {rgb: false}).then(
         () => nvim.getVersion()
     ).then(
         v => console.log(v)
     ).then(
         () => nvim.command('vsp')
     ).then(
-        () => nvim.getWindows()
+        () => nvim.listWins()
     ).then(
-        windows => nvim.setCurrentWindow(windows[1])
+        windows => nvim.setCurrentWin(windows[1])
     ).then(
-        () => nvim.getCurrentWindow()
+        () => nvim.getCurrentWin()
     ).then(win => {
         console.log(win);
-        return nvim.getCurrentBuffer();
+        return nvim.getCurrentBuf();
     }).then(
         buf => buf.getLineSlice(0, -1, true, true).then(lines => {
             console.log(lines);
