@@ -24,10 +24,10 @@ function spawnNvim() {
 describe('Nvim', () => {
     let proc, nvim, requests, notifications;
 
-    before(done => {
+    before(() => {
         proc = spawnNvim();
 
-        attach(proc.stdin, proc.stdout).then(n => {
+        return attach(proc.stdin, proc.stdout).then(n => {
             nvim = n;
             nvim.on('request', (method, args, resp) => {
                 requests.push({method: method, args: args});
@@ -36,7 +36,6 @@ describe('Nvim', () => {
             nvim.on('notification', (method, args) => {
                 notifications.push({method: method, args: args});
             });
-            done();
         });
     });
 
@@ -50,20 +49,18 @@ describe('Nvim', () => {
         nvim.quit();
     });
 
-    it('can send requests and receive response', done => {
-        nvim.eval('{"k1": "v1", "k2": 2}').then(res => {
+    it('can send requests and receive response', () => {
+        return nvim.eval('{"k1": "v1", "k2": 2}').then(res => {
             deepEqual(res, {k1: 'v1', k2: 2});
-            done();
-        }).catch(err => done(err));
+        });
     });
 
-    it('can receive requests and send responses', done => {
-        nvim.eval('rpcrequest(1, "request", 1, 2, 3)').then(res => {
+    it('can receive requests and send responses', () => {
+        return nvim.eval('rpcrequest(1, "request", 1, 2, 3)').then(res => {
             strictEqual(res, 'received request(1,2,3)');
             deepEqual(requests, [{method: 'request', args: [1, 2, 3]}]);
             deepEqual(notifications, []);
-            done();
-        }).catch(err => done(err));
+        });
     });
 
     it('can receive notifications', done => {
@@ -77,8 +74,8 @@ describe('Nvim', () => {
         }).catch(err => done(err));
     });
 
-    it('can deal with custom types', done => {
-        nvim.command('vsp')
+    it('can deal with custom types', () => {
+        return nvim.command('vsp')
             .then(res => nvim.listWins())
             .then(windows => {
                 strictEqual(windows.length, 2);
@@ -99,27 +96,23 @@ describe('Nvim', () => {
                             .then(() => buf.getLineSlice(0, -1, true, true))
                             .then(lines => {
                                 deepEqual(lines, ['line1', 'line2']);
-                                done();
                             });
                     });
-            }).catch(err => done(err));
+            });
     });
 
-    it('can call APIs while UI attaching', done => {
-        nvim.uiAttach(80, 24, {rgb: false})
-            .then( nvim.listWins())
+    it('can call APIs while UI attaching', () => {
+        return nvim.uiAttach(80, 24, {rgb: false})
+            .then(nvim.listWins())
             .then(() => nvim.uiTryResize(160, 48))
-            .then(() => nvim.uiDetach())
-            .catch(err => done(err))
-            .then(() => done());
+            .then(() => nvim.uiDetach());
     });
 
-    it('accepts "notify" to control to send notification or request', done => {
+    it('accepts "notify" to control to send notification or request', () => {
         strictEqual(nvim.command('vsp', true), undefined);
-        nvim.listWins(false).then(res => {
+        return nvim.listWins(false).then(res => {
             ok(res.length > 0);
-            done();
-        }).catch(err => done(err));
+        });
     });
 
     it('emits "disconnect" event when original process is killed', done => {
@@ -142,16 +135,11 @@ describe('Nvim', () => {
             });
     });
 
-    it('shows the version with getVersion() method', done => {
-        nvim.getVersion().then(v => {
-            try {
-                ok(v.major >= 0);
-                ok(v.minor >= 2);
-                ok(v.patch >= 0);
-                done();
-            } catch(e) {
-                done(e);
-            }
-        }).catch(done);
+    it('shows the version with getVersion() method', () => {
+        return nvim.getVersion().then(v => {
+            ok(v.major >= 0);
+            ok(v.minor >= 2);
+            ok(v.patch >= 0);
+        });
     });
 });
