@@ -5,6 +5,7 @@ export interface Nvim extends NodeJS.EventEmitter {
   bufGetLines(buffer: Buffer, start: number, end: number, strict_indexing: boolean, notify?: boolean): Promise<Array<string>>;
   bufSetLines(buffer: Buffer, start: number, end: number, strict_indexing: boolean, replacement: Array<string>, notify?: boolean): Promise<void>;
   bufGetVar(buffer: Buffer, name: string, notify?: boolean): Promise<VimValue>;
+  bufGetChangedtick(buffer: Buffer, notify?: boolean): Promise<number>;
   bufSetVar(buffer: Buffer, name: string, value: VimValue, notify?: boolean): Promise<void>;
   bufDelVar(buffer: Buffer, name: string, notify?: boolean): Promise<void>;
   bufGetOption(buffer: Buffer, name: string, notify?: boolean): Promise<VimValue>;
@@ -62,6 +63,7 @@ export interface Nvim extends NodeJS.EventEmitter {
   unsubscribe(event: string, notify?: boolean): Promise<void>;
   getColorByName(name: string, notify?: boolean): Promise<number>;
   getColorMap(notify?: boolean): Promise<{[key: string]: RPCValue}>;
+  getMode(notify?: boolean): Promise<{[key: string]: RPCValue}>;
   getApiInfo(notify?: boolean): Promise<Array<RPCValue>>;
   callAtomic(calls: Array<RPCValue>, notify?: boolean): Promise<Array<RPCValue>>;
   winGetBuf(window: Window, notify?: boolean): Promise<Buffer>;
