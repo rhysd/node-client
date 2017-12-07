@@ -43,7 +43,7 @@ attach(nvim_proc.stdin, nvim_proc.stdout).then(function(nvim) {
 
   nvim
     .command('vsp')
-    .then(() => nvim.getWindows())
+    .then(() => nvim.listWins())
     .then(windows => {
       console.log(windows.length);  // 2
       console.log(windows[0] instanceof nvim.Window); // true
